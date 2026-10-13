@@ -1,0 +1,32 @@
+{
+  "_doc": "Keys starting with _ are comments. Missing keys fall back to the defaults in hooks/_common.py, so you can delete anything you do not change.",
+  "background": {
+    "_doc": "Interpreters whose Start-Process without -Wait is blocked in PowerShell.",
+    "enabled": true,
+    "interpreters": [
+      "python",
+      "pythonw",
+      "py",
+      "powershell",
+      "pwsh",
+      "node",
+      "cmd"
+    ]
+  },
+  "subagent_model": {
+    "_doc": "default_model: null blocks Agent calls without a model; a name such as \"sonnet\" or \"haiku\" fills it in instead. exempt_types: agent types that may go without one.",
+    "enabled": true,
+    "default_model": null,
+    "exempt_types": [
+      "fork",
+      "claude-code-guide",
+      "statusline-setup"
+    ]
+  },
+  "statusline": {
+    "_doc": "path_segments: how many trailing folders to show. show_context: append the last call's context size.",
+    "path_segments": 2,
+    "ignore_untracked": true,
+    "show_context": true
+  }
+}

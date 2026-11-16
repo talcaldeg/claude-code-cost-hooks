@@ -1,0 +1,26 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/background_process_guard.py\" 2>/dev/null || python \"${CLAUDE_PLUGIN_ROOT}/hooks/background_process_guard.py\"",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/subagent_model_guard.py\" 2>/dev/null || python \"${CLAUDE_PLUGIN_ROOT}/hooks/subagent_model_guard.py\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

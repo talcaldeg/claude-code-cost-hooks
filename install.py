@@ -49,6 +49,12 @@ HOOKS = [
 # This folder may hold only some of the scripts: register the ones present.
 HOOKS = [h for h in HOOKS if (HERE / "hooks" / h[2]).is_file()]
 
+# The plugin registers the guards itself and cannot set a status line:
+# --statusline-only installs just the status line next to it.
+if "--statusline-only" in sys.argv:
+    sys.argv.remove("--statusline-only")
+    HOOKS = []
+
 
 def claude_dir(arg):
     if arg:

@@ -1,0 +1,13 @@
+{
+  "name": "cost-hooks",
+  "version": "1.0.0",
+  "description": "Two guards that stop costly Claude Code habits: subagents launched without a model, and background processes the harness cannot see or stop.",
+  "author": {
+    "name": "Tomas Alcalde",
+    "url": "https://github.com/talcaldeg"
+  },
+  "homepage": "https://github.com/talcaldeg/claude-code-cost-hooks",
+  "repository": "https://github.com/talcaldeg/claude-code-cost-hooks",
+  "license": "MIT",
+  "keywords": ["hooks", "cost", "tokens", "subagents", "context"]
+}

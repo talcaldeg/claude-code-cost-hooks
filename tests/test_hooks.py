@@ -144,6 +144,43 @@ def main():
         check("status line shows model and context", rc == 0 and "Opus" in out and "ctx 85k" in out,
               repr(out) + err)
 
+        # --- plugin
+        plugin = json.loads((REPO / ".claude-plugin" / "plugin.json").read_text(encoding="utf-8"))
+        market = json.loads((REPO / ".claude-plugin" / "marketplace.json").read_text(encoding="utf-8"))
+        check("plugin name matches its marketplace entry",
+              [p["name"] for p in market["plugins"]] == [plugin["name"]]
+              and market["plugins"][0]["source"] == "./")
+        plugin_hooks = json.loads((REPO / "hooks" / "hooks.json").read_text(encoding="utf-8"))["hooks"]
+        registered = sorted((g["matcher"], h["command"].split("/hooks/")[1].split('"')[0])
+                            for g in plugin_hooks["PreToolUse"] for h in g["hooks"])
+        check("plugin registers the two guards with the installer's matchers",
+              registered == [("Agent", "subagent_model_guard.py"),
+                             ("Bash|PowerShell", "background_process_guard.py")], str(registered))
+
+        git_bash = Path(os.environ.get("ProgramFiles", "C:/Program Files")) / "Git" / "bin" / "bash.exe"
+        bash = str(git_bash) if os.name == "nt" and git_bash.is_file() else shutil.which("bash")
+        if bash:
+            penv = dict(env, CLAUDE_PLUGIN_ROOT=str(REPO).replace("\\", "/"),
+                        CONTEXT_ECONOMY_CONFIG=str(tmp / "none.json"))
+            cmd = [h["command"] for g in plugin_hooks["PreToolUse"] if g["matcher"] == "Agent"
+                   for h in g["hooks"]][0]
+            res = run([bash, "-c", cmd], penv, cwd=tmp, stdin=json.dumps(
+                {"session_id": "t", "tool_name": "Agent", "tool_input": {"prompt": "p"}}).encode("utf-8"))
+            check("plugin hook command runs the guard", decision(res).get("permissionDecision") == "deny",
+                  repr(res))
+
+        cfg2 = tmp / "claude2"
+        cfg2.mkdir()
+        env2 = dict(env, CLAUDE_CONFIG_DIR=str(cfg2))
+        rc, out, err = run([PY, str(REPO / "install.py"), "--statusline-only"], env2)
+        s2 = json.loads((cfg2 / "settings.json").read_text(encoding="utf-8"))
+        check("--statusline-only sets the status line and no hooks",
+              rc == 0 and not s2.get("hooks")
+              and "statusline.py" in (s2.get("statusLine") or {}).get("command", ""), out + err)
+        rc, out, err = run([PY, str(REPO / "install.py"), "--uninstall"], env2)
+        s2 = json.loads((cfg2 / "settings.json").read_text(encoding="utf-8"))
+        check("uninstall after --statusline-only removes the status line", rc == 0 and not s2, out + err)
+
         # --- uninstall
         rc, out, err = install("--uninstall")
         s = settings()

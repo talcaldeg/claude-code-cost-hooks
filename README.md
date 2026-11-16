@@ -31,6 +31,43 @@ it acts at the moment of the call.
 
 Requirements: Claude Code and Python 3.8 or newer (no packages).
 
+### As a plugin (recommended)
+
+Inside Claude Code:
+
+```text
+/plugin marketplace add talcaldeg/claude-code-cost-hooks
+/plugin install cost-hooks@claude-code-cost-hooks
+```
+
+On Claude Code 2.1.275 or later, one line does both:
+
+```text
+/plugin install cost-hooks --marketplace talcaldeg/claude-code-cost-hooks
+```
+
+Restart Claude Code (or run `/reload-plugins`). The plugin registers the two guards and updates
+with `/plugin update cost-hooks`. The hooks call `python3` and fall back to `python`, so they
+work on Windows too.
+
+A plugin cannot set the status line. To add it next to the plugin:
+
+```bash
+git clone https://github.com/talcaldeg/claude-code-cost-hooks
+python3 claude-code-cost-hooks/install.py --statusline-only
+```
+
+The guards use their defaults. To change them, copy `config.example.json` anywhere, edit it and
+point to it from the `env` block of `~/.claude/settings.json`:
+
+```json
+{"env": {"CONTEXT_ECONOMY_CONFIG": "~/.claude/context-economy/config.json"}}
+```
+
+Use the plugin or the installer below, not both: with both, each guard runs twice.
+
+### With the installer
+
 ```bash
 git clone https://github.com/talcaldeg/claude-code-cost-hooks
 cd claude-code-cost-hooks

@@ -28,3 +28,18 @@ jobs:
           python-version: ${{ matrix.python }}
       - name: Test
         run: python tests/test_hooks.py
+
+  plugin:
+    name: validate plugin
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Validate manifests
+        run: |
+          npm install -g @anthropic-ai/claude-code
+          claude plugin validate . --strict
+          claude plugin validate .claude-plugin/marketplace.json --strict

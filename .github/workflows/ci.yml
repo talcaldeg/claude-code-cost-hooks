@@ -18,7 +18,12 @@ jobs:
           # Python 3.8 has no build for the Apple-silicon runners behind macos-latest.
           - os: macos-latest
             python: "3.8"
+          # Nor for Ubuntu 26.04, behind ubuntu-latest since October 2026.
+          - os: ubuntu-latest
+            python: "3.8"
         include:
+          - os: ubuntu-24.04
+            python: "3.8"
           - os: macos-15-intel
             python: "3.8"
     steps:
